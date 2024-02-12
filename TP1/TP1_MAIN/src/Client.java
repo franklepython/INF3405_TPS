@@ -1,4 +1,5 @@
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.net.Socket;
 
 import java.util.Scanner;
@@ -19,15 +20,15 @@ public class Client {
 			int port = portValider(scanner);
 			
 			System.out.print("Saisie un nom d'utilisateur: ");
-			String nom = scanner.nextLine();
+			String username = scanner.nextLine();
 			System.out.print("Saisie un mot de passe: ");
-			String mdp = scanner.nextLine();
-			// Potentiellement envoie en socket dans un try pour l'envoyer au server
+			String password = scanner.nextLine();
 			
 			// Create a new connection to the server
 			try (Socket socket = new Socket(serverAddress, port)) {
 				System.out.format("Connected to server at [%s:%d]%n", serverAddress, port);
-
+				
+                
 				// Create an incoming channel to receive messages sent by the server
 				DataInputStream in = new DataInputStream(socket.getInputStream());
 
@@ -40,6 +41,11 @@ public class Client {
 		}
 	}
 	
+	/** 
+     * Vérifie si l'addresse IP est sur 4 octet
+     * @param scanner pour pouvoir lire les entrées de l'utilisateur
+     * @return l'addresse du server vérifié 
+     */
 	private static String serverAddressValider(Scanner scanner) {
 		String serverAddress;
 		while (true) {
@@ -60,7 +66,12 @@ public class Client {
 		}
 		return serverAddress;
 	}
-
+	
+	/** 
+     * Vérifie si le port est un nombre et si il est entre 5000 et 5050
+     * @param scanner pour pouvoir lire les entrées de l'utilisateur
+     * @return le port validé
+     */
 	private static int portValider(Scanner scanner) {
 		int port;
 		while (true) {

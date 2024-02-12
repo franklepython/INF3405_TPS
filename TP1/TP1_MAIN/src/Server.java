@@ -1,10 +1,12 @@
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+
 
 public class Server {
     private static ServerSocket listener;
@@ -41,6 +43,11 @@ public class Server {
         }
     }
     
+    /** 
+     * Vérifie si l'addresse IP est sur 4 octet
+     * @param scanner pour pouvoir lire les entrées de l'utilisateur
+     * @return l'addresse du server vérifié 
+     */
     private static String serverAddressValider(Scanner scanner) {
 		String serverAddress;
 		while (true) {
@@ -61,7 +68,12 @@ public class Server {
 		}
 		return serverAddress;
 	}
-
+    
+    /** 
+     * Vérifie si le port est un nombre et si il est entre 5000 et 5050
+     * @param scanner pour pouvoir lire les entrées de l'utilisateur
+     * @return le port validé
+     */
 	private static int portValider(Scanner scanner) {
 		int serverPort;
 		while (true) {
