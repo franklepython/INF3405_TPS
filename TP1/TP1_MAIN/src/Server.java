@@ -10,16 +10,18 @@ import java.util.regex.Pattern;
 
 public class Server {
     private static ServerSocket listener;
+    private static UserManager userManager;
 
+    //127.0.0.1:5000
     public static void main(String[] args) {
         try (Scanner scanner = new Scanner(System.in)){
             // Address and port of the server
-        	//String serverAddress = "127.0.0.1";
-            //int serverPort = 5000;
-        	
             String serverAddress = serverAddressValider(scanner);
-			int serverPort = portValider(scanner);
-			
+            int serverPort = portValider(scanner);
+
+            // Create the UserManager instance
+            userManager = new UserManager("./users.csv");
+            
             // Create the connection for communicating with clients
             listener = new ServerSocket();
             listener.setReuseAddress(true);
@@ -33,7 +35,9 @@ public class Server {
             try {
                 while (true) {
                     // Wait for a new client to connect
-                    new ClientHandler(listener.accept(), clientNumber++).start();
+                    Socket clientSocket = listener.accept(); // Accept the client connection
+                    // Pass the UserManager instance to the new ClientHandler
+                    new ClientHandler(clientSocket, clientNumber++, userManager).start();
                 }
             } finally {
                 listener.close();
@@ -68,7 +72,6 @@ public class Server {
 		}
 		return serverAddress;
 	}
-    
     /** 
      * Vérifie si le port est un nombre et si il est entre 5000 et 5050
      * @param scanner pour pouvoir lire les entrées de l'utilisateur

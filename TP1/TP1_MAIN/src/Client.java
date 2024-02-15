@@ -10,36 +10,38 @@ import java.util.regex.Pattern;
 // Pour verifier si c'est un adresse IP de 4 octet
 
 public class Client {
-	public static void main(String[] args) {
-		try (Scanner scanner = new Scanner(System.in)){ 
-			// Address and port of the server
-			// String serverAddress = "127.0.0.1";
-			// int port = 5000;
+    public static void main(String[] args) {
+        try (Scanner scanner = new Scanner(System.in)) {
+            // Get server address and port
+            String serverAddress = serverAddressValider(scanner);
+            int port = portValider(scanner);
 
-			String serverAddress = serverAddressValider(scanner);
-			int port = portValider(scanner);
-			
-			System.out.print("Saisie un nom d'utilisateur: ");
-			String username = scanner.nextLine();
-			System.out.print("Saisie un mot de passe: ");
-			String password = scanner.nextLine();
-			
-			// Create a new connection to the server
-			try (Socket socket = new Socket(serverAddress, port)) {
-				System.out.format("Connected to server at [%s:%d]%n", serverAddress, port);
-				
+            // Get username and password from user
+            System.out.print("Saisie un nom d'utilisateur: ");
+            String username = scanner.nextLine();
+            System.out.print("Saisie un mot de passe: ");
+            String password = scanner.nextLine();
+
+            try (Socket socket = new Socket(serverAddress, port);
+                 DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+                 DataInputStream in = new DataInputStream(socket.getInputStream())) {
                 
-				// Create an incoming channel to receive messages sent by the server
-				DataInputStream in = new DataInputStream(socket.getInputStream());
+                System.out.format("Connected to server at [%s:%d]%n", serverAddress, port);
 
-				// Wait for the reception of a message sent by the server on the channel
-				String helloMessageFromServer = in.readUTF();
-				System.out.println(helloMessageFromServer);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+                // Send username and password to server
+                out.writeUTF(username + "," + password);
+
+                // Wait for the server's response
+                String responseFromServer = in.readUTF();
+                System.out.println(responseFromServer);
+                
+                // Optionally: Handle further interactions based on server's response
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 	
 	/** 
      * Vérifie si l'addresse IP est sur 4 octet
@@ -90,4 +92,3 @@ public class Client {
 		return port;
 	}
 }
-
