@@ -54,6 +54,7 @@ public class Client {
 							out.writeUTF(userMessageString);
 						} else {
 							// TODO
+							System.out.println("Message trop long. Veuillez saisir un message d'au plus 200 caractères.");
 						}
 					}
 				}
