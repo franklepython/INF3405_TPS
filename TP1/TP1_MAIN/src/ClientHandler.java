@@ -2,6 +2,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class ClientHandler extends Thread {
     private Socket socket;
@@ -43,7 +45,13 @@ public class ClientHandler extends Thread {
                 while (true) {
                     String receivedMessage = in.readUTF();
                     // TODO complete the message to print with expected format
-                    String messageToPrint = "[" + username + " - IP address:socket - DATE]: " + receivedMessage;
+
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd@HH:mm:ss");
+                    String date = dateFormat.format(new Date());
+                    String ipAddressAndClientPort = socket.getRemoteSocketAddress().toString().substring(1);
+                    // String messageToPrint = "[" + username + " - IP address:socket - DATE]: " + receivedMessage;
+                    String messageToPrint = "[" + username + " - " + ipAddressAndClientPort + " - " + date + "]: " + receivedMessage;
+
 
                     // [Utilisateur 1 - 132.207.29.107:46202 - 2017-10-13@13:02:01]: Salut Utilisateur 2 !
                     // [Utilisateur 2 - 132.207.29.117:37608 - 2017-10-13@13:03:24]: Yo Utilisateur 1 !
