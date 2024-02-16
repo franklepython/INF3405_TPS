@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 public class Server {
     private static ServerSocket listener;
     private static UserManager userManager;
+    private static ArrayList<ClientHandler> clientHandlers = new ArrayList<ClientHandler>();
 
     //127.0.0.1:5000
     public static void main(String[] args) {
@@ -37,7 +38,10 @@ public class Server {
                     // Wait for a new client to connect
                     Socket clientSocket = listener.accept(); // Accept the client connection
                     // Pass the UserManager instance to the new ClientHandler
-                    new ClientHandler(clientSocket, clientNumber++, userManager).start();
+                    
+                    ClientHandler clientHandler = new ClientHandler(clientSocket, clientNumber++, userManager);
+                    clientHandler.start();
+                    clientHandlers.add(clientHandler);
                 }
             } finally {
                 listener.close();
@@ -45,6 +49,14 @@ public class Server {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static void newMessageToProcess(String messageToSend) {
+        for (ClientHandler clientHandler : clientHandlers) {
+            clientHandler.sendMessageToClient(messageToSend);
+        }
+
+        // TODO - save message in database
     }
     
     /** 

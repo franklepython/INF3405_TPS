@@ -1,5 +1,6 @@
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.Socket;
 
 import java.util.Scanner;
@@ -10,54 +11,75 @@ import java.util.regex.Pattern;
 // Pour verifier si c'est un adresse IP de 4 octet
 
 public class Client {
-    public static void main(String[] args) {
-        try (Scanner scanner = new Scanner(System.in)) {
-            // Get server address and port
-            String serverAddress = serverAddressValider(scanner);
-            int port = portValider(scanner);
+	public static void main(String[] args) {
+		try (Scanner scanner = new Scanner(System.in)) {
+			// Get server address and port
+			String serverAddress = serverAddressValider(scanner);
+			int port = portValider(scanner);
 
-            // Get username and password from user
-            System.out.print("Saisie un nom d'utilisateur: ");
-            String username = scanner.nextLine();
-            System.out.print("Saisie un mot de passe: ");
-            String password = scanner.nextLine();
+			// Get username and password from user
+			System.out.print("Saisie un nom d'utilisateur: ");
+			String username = scanner.nextLine();
+			System.out.print("Saisie un mot de passe: ");
+			String password = scanner.nextLine();
 
-            try (Socket socket = new Socket(serverAddress, port);
-                 DataOutputStream out = new DataOutputStream(socket.getOutputStream());
-                 DataInputStream in = new DataInputStream(socket.getInputStream())) {
-                
-                System.out.format("Connected to server at [%s:%d]%n", serverAddress, port);
+			try (Socket socket = new Socket(serverAddress, port);
+					DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+					DataInputStream in = new DataInputStream(socket.getInputStream())) {
 
-                // Send username and password to server
-                out.writeUTF(username + "," + password);
+				System.out.format("Connected to server at [%s:%d]%n", serverAddress, port);
 
-                // Wait for the server's response
-                String responseFromServer = in.readUTF();
-                System.out.println(responseFromServer);
-                
-                // Optionally: Handle further interactions based on server's response
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+				// Send username and password to server
+				out.writeUTF(username + "," + password);
 
-	
-	/** 
-     * Vérifie si l'addresse IP est sur 4 octet
-     * @param scanner pour pouvoir lire les entrées de l'utilisateur
-     * @return l'addresse du server vérifié 
-     */
+				// Wait for the server's response
+				String responseFromServer = in.readUTF();
+				System.out.println(responseFromServer);
+
+				if (responseFromServer.equals("Wrong password")) {
+					// Optionally: Handle further interactions based on server's response
+
+				} else {
+					new ClientServerListener(in).start();
+
+					// client must continuously listen to messages received by server (socket's
+					// DataInputStream) - for messages sent by other users, to be displayed with
+					// System.out.println
+					// client must continuously expect input from user (scanner.nextLine), and send
+					// it through socket's DataOutputStream
+					while (true) {
+						// read user input, send to server
+						String userMessageString = scanner.nextLine();
+						if (userMessageString.length() <= 200) {
+							out.writeUTF(userMessageString);
+						} else {
+							// TODO
+						}
+					}
+				}
+
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Vérifie si l'addresse IP est sur 4 octet
+	 * 
+	 * @param scanner pour pouvoir lire les entrées de l'utilisateur
+	 * @return l'addresse du server vérifié
+	 */
 	private static String serverAddressValider(Scanner scanner) {
 		String serverAddress;
 		while (true) {
 			System.out.print("Saisie l'adresse IP du serveur: ");
 			serverAddress = scanner.nextLine();
-			
-			String zeroTo255 = "(\\d{1,2}|(0|1)\\" + "d{2}|2[0-4]\\d|25[0-5])";  
-			String regex = zeroTo255 + "\\."+ zeroTo255 + "\\." + zeroTo255 + "\\." + zeroTo255;  
-			Pattern pattern = Pattern.compile(regex);  
-			Matcher matcher = pattern.matcher(serverAddress);  
+
+			String zeroTo255 = "(\\d{1,2}|(0|1)\\" + "d{2}|2[0-4]\\d|25[0-5])";
+			String regex = zeroTo255 + "\\." + zeroTo255 + "\\." + zeroTo255 + "\\." + zeroTo255;
+			Pattern pattern = Pattern.compile(regex);
+			Matcher matcher = pattern.matcher(serverAddress);
 
 			if (matcher.matches()) {
 				break;
@@ -68,12 +90,13 @@ public class Client {
 		}
 		return serverAddress;
 	}
-	
-	/** 
-     * Vérifie si le port est un nombre et si il est entre 5000 et 5050
-     * @param scanner pour pouvoir lire les entrées de l'utilisateur
-     * @return le port validé
-     */
+
+	/**
+	 * Vérifie si le port est un nombre et si il est entre 5000 et 5050
+	 * 
+	 * @param scanner pour pouvoir lire les entrées de l'utilisateur
+	 * @return le port validé
+	 */
 	private static int portValider(Scanner scanner) {
 		int port;
 		while (true) {
@@ -81,7 +104,7 @@ public class Client {
 			try {
 				port = Integer.parseInt(scanner.nextLine());
 				if (port >= 5000 && port <= 5050) {
-					break; 
+					break;
 				} else {
 					System.out.println("Port invalide, il doit etre entre 5000 et 5050");
 				}
@@ -90,5 +113,25 @@ public class Client {
 			}
 		}
 		return port;
+	}
+}
+
+class ClientServerListener extends Thread {
+	private DataInputStream in;
+
+	public ClientServerListener(DataInputStream in) {
+		this.in = in;
+	}
+
+	public void run() {
+		try {
+			while (true) {
+				// read server input, display on screen
+				String serverInput = this.in.readUTF();
+				System.out.println(serverInput);
+			}
+		} catch (IOException e) {
+
+		}
 	}
 }

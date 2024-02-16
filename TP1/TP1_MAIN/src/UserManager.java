@@ -8,7 +8,7 @@ public class UserManager {
 
     public UserManager(String filePath) {
         this.filePath = filePath;
-        initializeFile(); 
+        initializeFile();
         loadUsers();
     }
 
@@ -29,10 +29,11 @@ public class UserManager {
     public synchronized boolean validateUser(String username) {
         return users.containsKey(username);
     }
-    
+
     public synchronized boolean validatePassword(String username, String password) {
         return users.containsKey(username) && users.get(username).equals(password);
     }
+
     public synchronized boolean addUser(String username, String password) {
         if (users.containsKey(username)) {
             return false;
@@ -44,8 +45,8 @@ public class UserManager {
 
     private void saveUser(String username, String password) {
         try (FileWriter fw = new FileWriter(filePath, true);
-             BufferedWriter bw = new BufferedWriter(fw);
-             PrintWriter out = new PrintWriter(bw)) {
+                BufferedWriter bw = new BufferedWriter(fw);
+                PrintWriter out = new PrintWriter(bw)) {
             out.println(username + "," + password);
         } catch (IOException e) {
             e.printStackTrace();
@@ -53,21 +54,34 @@ public class UserManager {
     }
 
     private void initializeFile() {
-    	File file = new File(filePath);
-    	if (file.exists()) {
-    		boolean deleted = file.delete();
-    		if (!deleted) {
-    			System.out.println("Failed to delete existing file.");
-    		}
-    	}
-    	try {
-    		boolean created = file.createNewFile();
-    		if (!created) {
-    			System.out.println("Failed to create new file.");
-    		}
-    	} catch (IOException e) {
-    		e.printStackTrace();
-    	}
+        File file = new File(filePath);
+        try {
+            if (file.createNewFile()) {
+                
+            } else {
+                // file already exists
+            }
+        } catch (IOException e) {
+
+        }
+        
+        /*
+        File file = new File(filePath);
+            // boolean deleted = file.delete();
+            // if (!deleted) {
+            // System.out.println("Failed to delete existing file.");
+            // }
+        } else {
+            try {
+                boolean created = file.createNewFile();
+                if (!created) {
+                    System.out.println("Failed to create new file.");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        */
 
     }
 }

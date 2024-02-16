@@ -17,7 +17,7 @@ public class ClientHandler extends Thread {
 
     public void run() {
         try (DataOutputStream out = new DataOutputStream(socket.getOutputStream());
-             DataInputStream in = new DataInputStream(socket.getInputStream())) {
+                DataInputStream in = new DataInputStream(socket.getInputStream())) {
 
             // Read the response from client
             String[] credentials = in.readUTF().split(",");
@@ -25,20 +25,33 @@ public class ClientHandler extends Thread {
                 String username = credentials[0].trim();
                 String password = credentials[1].trim();
 
-              //Validate user or add a new one
+                // Validate user or add a new one
                 boolean isValidUser = userManager.validateUser(username);
                 boolean isValidPassword = userManager.validatePassword(username, password);
                 if (!isValidUser) { // If user does not exist, add them.
                     userManager.addUser(username, password);
                     out.writeUTF("New user created. You are logged in as: " + username);
                 } else {
-                	if (!isValidPassword) {
-                		out.writeUTF("Wrong password");
-                	}
-                	else {
-                		out.writeUTF("Hello " + username + " - you are logged in.");
-                	}
+                    if (!isValidPassword) {
+                        out.writeUTF("Wrong password");
+                        throw new IOException("Invalid username/password.");
+                    } else {
+                        out.writeUTF("Hello " + username + " - you are logged in.");
+                    }
                 }
+
+                while (true) {
+                    String receivedMessage = in.readUTF();
+                    // TODO complete the message to print with expected format
+                    String messageToPrint = "[" + username + " - IP address:socket - DATE]: " + receivedMessage;
+
+                    // [Utilisateur 1 - 132.207.29.107:46202 - 2017-10-13@13:02:01]: Salut Utilisateur 2 !
+                    // [Utilisateur 2 - 132.207.29.117:37608 - 2017-10-13@13:03:24]: Yo Utilisateur 1 !
+                    
+                    //System.out.println(messageToPrint);
+                    Server.newMessageToProcess(messageToPrint);
+                }
+
             } else {
                 out.writeUTF("Invalid login format. Connection will be closed.");
             }
@@ -51,6 +64,15 @@ public class ClientHandler extends Thread {
                 System.out.println("Couldn't close a socket, what's going on?");
             }
             System.out.println("Connection with client# " + clientNumber + " closed");
+        }
+    }
+
+    public void sendMessageToClient(String messageToSend) {
+        try {
+            DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+            out.writeUTF(messageToSend);
+        } catch (IOException e) {
+
         }
     }
 }
