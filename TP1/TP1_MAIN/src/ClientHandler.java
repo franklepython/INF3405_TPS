@@ -74,7 +74,12 @@ public class ClientHandler extends Thread {
             System.out.println("Connection with client# " + clientNumber + " closed");
         }
     }
-
+    
+    /**
+	 * Send the message to the Client
+	 *
+	 * @param message to send
+	 */
     public void sendMessageToClient(String messageToSend) {
         try {
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());

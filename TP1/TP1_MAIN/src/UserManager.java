@@ -11,7 +11,10 @@ public class UserManager {
         initializeFile();
         loadUsers();
     }
-
+    
+    /**
+	 * Load the users in the file
+	 */
     private void loadUsers() {
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
@@ -25,15 +28,32 @@ public class UserManager {
             e.printStackTrace();
         }
     }
-
+    /**
+	 * Validate if users is in map of users
+	 * 
+	 * @param username 
+	 * @return boolean true or false
+	 */
     public synchronized boolean validateUser(String username) {
         return users.containsKey(username);
     }
-
+    
+    /**
+	 * Validate if it's the correct password 
+	 * 
+	 * @param username and password
+	 * @return boolean true or false
+	 */
     public synchronized boolean validatePassword(String username, String password) {
         return users.containsKey(username) && users.get(username).equals(password);
     }
-
+    
+    /**
+	 * Add users and password to file and map
+	 * 
+	 * @param username and password
+	 * @return boolean true or false
+	 */
     public synchronized boolean addUser(String username, String password) {
         if (users.containsKey(username)) {
             return false;
@@ -42,7 +62,12 @@ public class UserManager {
         saveUser(username, password);
         return true;
     }
-
+    
+    /**
+	 * Save users in file 
+	 * 
+	 * @param username and password
+	 */
     private void saveUser(String username, String password) {
         try (FileWriter fw = new FileWriter(filePath, true);
                 BufferedWriter bw = new BufferedWriter(fw);
@@ -52,7 +77,10 @@ public class UserManager {
             e.printStackTrace();
         }
     }
-
+    
+    /**
+	 * Creation file  
+	 */
     private void initializeFile() {
         File file = new File(filePath);
         try {

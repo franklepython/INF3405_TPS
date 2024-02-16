@@ -59,51 +59,54 @@ public class Server {
         // TODO - save message in database
     }
     
-    /** 
-     * Vérifie si l'addresse IP est sur 4 octet
-     * @param scanner pour pouvoir lire les entrées de l'utilisateur
-     * @return l'addresse du server vérifié 
-     */
-    private static String serverAddressValider(Scanner scanner) {
+    /**
+	 * Checks if the IP address has 4 octets.
+	 *
+	 * @param scanner to read user inputs
+	 * @return the verified server address
+	 */
+	private static String serverAddressValider(Scanner scanner) {
 		String serverAddress;
 		while (true) {
-			System.out.print("Saisie l'adresse IP du serveur: ");
+			System.out.print("Enter the server's IP address: ");
 			serverAddress = scanner.nextLine();
-			
-			String zeroTo255 = "(\\d{1,2}|(0|1)\\" + "d{2}|2[0-4]\\d|25[0-5])";  
-			String regex = zeroTo255 + "\\."+ zeroTo255 + "\\." + zeroTo255 + "\\." + zeroTo255;  
-			Pattern pattern = Pattern.compile(regex);  
-			Matcher matcher = pattern.matcher(serverAddress);  
+
+			String zeroTo255 = "(\\d{1,2}|(0|1)\\" + "d{2}|2[0-4]\\d|25[0-5])";
+			String regex = zeroTo255 + "\\." + zeroTo255 + "\\." + zeroTo255 + "\\." + zeroTo255;
+			Pattern pattern = Pattern.compile(regex);
+			Matcher matcher = pattern.matcher(serverAddress);
 
 			if (matcher.matches()) {
-				break; 
+				break;
 			} else {
-				System.out.println("Adresse IP du serveur incorrect");
+				System.out.println("Incorrect server IP address");
 			}
 
 		}
 		return serverAddress;
 	}
-    /** 
-     * Vérifie si le port est un nombre et si il est entre 5000 et 5050
-     * @param scanner pour pouvoir lire les entrées de l'utilisateur
-     * @return le port validé
-     */
+
+	/**
+	 * Checks if the port is a number and if it is between 5000 and 5050.
+	 *
+	 * @param scanner to read user inputs
+	 * @return the validated port
+	 */
 	private static int portValider(Scanner scanner) {
-		int serverPort;
+		int port;
 		while (true) {
-			System.out.print("Saisie le port du serveur entre 5000 et 5050: ");
+			System.out.print("Enter the server port between 5000 and 5050: ");
 			try {
-				serverPort = Integer.parseInt(scanner.nextLine());
-				if (serverPort >= 5000 && serverPort <= 5050) {
-					break; 
+				port = Integer.parseInt(scanner.nextLine());
+				if (port >= 5000 && port <= 5050) {
+					break;
 				} else {
-					System.out.println("Port invalide, il doit etre entre 5000 et 5050");
+					System.out.println("Invalid port, it must be between 5000 and 5050");
 				}
 			} catch (NumberFormatException e) {
-				System.out.println("Port invalide, cela doit etre un nombre");
+				System.out.println("Invalid port, it must be a number.");
 			}
 		}
-		return serverPort;
+		return port;
 	}
 }
