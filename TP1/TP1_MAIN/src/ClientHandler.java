@@ -25,13 +25,19 @@ public class ClientHandler extends Thread {
                 String username = credentials[0].trim();
                 String password = credentials[1].trim();
 
-                // Validate user or add a new one
-                boolean isValidUser = userManager.validateUser(username, password);
+              //Validate user or add a new one
+                boolean isValidUser = userManager.validateUser(username);
+                boolean isValidPassword = userManager.validatePassword(username, password);
                 if (!isValidUser) { // If user does not exist, add them.
                     userManager.addUser(username, password);
                     out.writeUTF("New user created. You are logged in as: " + username);
                 } else {
-                    out.writeUTF("Hello " + username + " - you are logged in.");
+                	if (!isValidPassword) {
+                		out.writeUTF("Wrong password");
+                	}
+                	else {
+                		out.writeUTF("Hello " + username + " - you are logged in.");
+                	}
                 }
             } else {
                 out.writeUTF("Invalid login format. Connection will be closed.");

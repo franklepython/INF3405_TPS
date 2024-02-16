@@ -26,10 +26,13 @@ public class UserManager {
         }
     }
 
-    public synchronized boolean validateUser(String username, String password) {
+    public synchronized boolean validateUser(String username) {
+        return users.containsKey(username);
+    }
+    
+    public synchronized boolean validatePassword(String username, String password) {
         return users.containsKey(username) && users.get(username).equals(password);
     }
-
     public synchronized boolean addUser(String username, String password) {
         if (users.containsKey(username)) {
             return false;
@@ -49,17 +52,22 @@ public class UserManager {
         }
     }
 
-private void initializeFile() {
-    File file = new File(filePath);
-    if (!file.exists()) {
-        try {
-            boolean created = file.createNewFile();
-            if (!created) {
-                System.out.println("Failed to create new file.");
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private void initializeFile() {
+    	File file = new File(filePath);
+    	if (file.exists()) {
+    		boolean deleted = file.delete();
+    		if (!deleted) {
+    			System.out.println("Failed to delete existing file.");
+    		}
+    	}
+    	try {
+    		boolean created = file.createNewFile();
+    		if (!created) {
+    			System.out.println("Failed to create new file.");
+    		}
+    	} catch (IOException e) {
+    		e.printStackTrace();
+    	}
+
     }
-}
 }
