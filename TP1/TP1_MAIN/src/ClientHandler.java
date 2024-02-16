@@ -19,9 +19,6 @@ public class ClientHandler extends Thread {
         try (DataOutputStream out = new DataOutputStream(socket.getOutputStream());
              DataInputStream in = new DataInputStream(socket.getInputStream())) {
 
-            // Ask for username and password
-            out.writeUTF("Please enter your username and password separated by a comma:");
-
             // Read the response from client
             String[] credentials = in.readUTF().split(",");
             if (credentials.length == 2) {
